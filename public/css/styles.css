@@ -918,3 +918,436 @@ footer {
         font-size: 1rem;
     }
 }
+
+/* ========================
+   TIMER PAGE STYLES
+======================== */
+
+.timer-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Timer Display Section */
+.timer-display-section {
+    background-color: #1a1a1a;
+    padding: 3rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    border: 3px solid #333;
+}
+
+.timer-display {
+    font-family: 'Courier New', 'Consolas', monospace;
+    font-size: 10rem;
+    font-weight: bold;
+    color: #00ff00;
+    text-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+    letter-spacing: 0.1em;
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.timer-display.timer-warning {
+    color: #ffa500;
+    text-shadow: 0 0 30px rgba(255, 165, 0, 0.5);
+}
+
+.timer-display.timer-finished {
+    color: #ff3333;
+    text-shadow: 0 0 30px rgba(255, 51, 51, 0.5);
+}
+
+.timer-status {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #888;
+}
+
+.timer-status.status-running {
+    color: #00ff00;
+}
+
+.timer-status.status-paused {
+    color: #ffa500;
+}
+
+.timer-status.status-finished {
+    color: #ff3333;
+}
+
+/* Timer Presets Section */
+.timer-presets-section {
+    background-color: #1a1a1a;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.timer-presets-section h3 {
+    color: #ffd700;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.preset-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.preset-btn {
+    padding: 1rem 1.5rem;
+    border: 2px solid #444;
+    background-color: #222;
+    color: #888;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    min-width: 80px;
+    transition: all 0.2s ease;
+}
+
+.preset-btn:hover {
+    background-color: #333;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+.preset-btn.active {
+    background-color: #ffd700;
+    color: #121212;
+    border-color: #ffd700;
+}
+
+/* Timer Controls Section */
+.timer-controls-section {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.control-btn {
+    padding: 1.25rem 3rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    min-width: 150px;
+    transition: all 0.2s ease;
+}
+
+.control-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-start {
+    background-color: #28a745;
+    color: white;
+    border: 2px solid #28a745;
+}
+
+.btn-start:hover:not(:disabled) {
+    background-color: #218838;
+}
+
+.btn-stop {
+    background-color: #ffc107;
+    color: #121212;
+    border: 2px solid #ffc107;
+}
+
+.btn-stop:hover:not(:disabled) {
+    background-color: #e0a800;
+}
+
+.btn-reset {
+    background-color: #6c757d;
+    color: white;
+    border: 2px solid #6c757d;
+}
+
+.btn-reset:hover:not(:disabled) {
+    background-color: #5a6268;
+}
+
+/* Timer responsive */
+@media (max-width: 768px) {
+    .timer-display {
+        font-size: 5rem;
+    }
+    
+    .timer-display-section {
+        padding: 2rem 1rem;
+    }
+    
+    .preset-btn {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        min-width: 70px;
+    }
+    
+    .control-btn {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        min-width: 120px;
+    }
+}
+
+/* ====================================
+   PUBLIC PAGE TIMER STYLES
+   ------------------------------------
+   Full-width panel below leaderboard.
+   Vertical stack: Clock → Presets → Controls
+   Dark Star Wars theme, projector-friendly.
+==================================== */
+
+/* Timer Section - Full Width Below Leaderboard */
+.public-timer-section {
+    width: 100%;
+    padding: 0 1rem 2rem 1rem;
+    box-sizing: border-box;
+}
+
+/* Timer Panel - Dark Bordered Container */
+.public-timer-panel {
+    background-color: #0d0d0d;
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --------------------------
+   Clock Row (Large Display)
+-------------------------- */
+.public-timer-clock-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Large Countdown Display - Projector Friendly */
+.public-timer-display {
+    font-family: 'Courier New', 'Consolas', monospace;
+    font-size: 8rem;
+    font-weight: bold;
+    color: #00ff00;
+    text-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+    letter-spacing: 0.08em;
+    line-height: 1;
+}
+
+/* Timer Warning State (30s or less) */
+.public-timer-display.timer-warning {
+    color: #ffa500;
+    text-shadow: 0 0 30px rgba(255, 165, 0, 0.5);
+}
+
+/* Timer Finished State (0:00) */
+.public-timer-display.timer-finished {
+    color: #ff3333;
+    text-shadow: 0 0 30px rgba(255, 51, 51, 0.5);
+}
+
+/* Timer Status Label */
+.public-timer-status {
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #666;
+    margin-top: 0.75rem;
+}
+
+.public-timer-status.status-running {
+    color: #00ff00;
+}
+
+.public-timer-status.status-paused {
+    color: #ffa500;
+}
+
+.public-timer-status.status-finished {
+    color: #ff3333;
+}
+
+/* --------------------------
+   Presets Row (Time Options)
+-------------------------- */
+.public-timer-presets-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Preset Buttons - Medium-Large */
+.public-preset-btn {
+    padding: 0.9rem 1.5rem;
+    border: 2px solid #444;
+    background-color: #1a1a1a;
+    color: #888;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    min-width: 70px;
+    text-align: center;
+}
+
+.public-preset-btn:hover {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+.public-preset-btn.active {
+    background-color: #ffd700;
+    color: #121212;
+    border-color: #ffd700;
+}
+
+/* --------------------------
+   Controls Row (Start/Stop/Reset)
+-------------------------- */
+.public-timer-controls-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+
+/* Control Buttons - Medium-Large Clickable */
+.public-control-btn {
+    padding: 1rem 2.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    min-width: 130px;
+}
+
+.public-control-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Start Button - Green */
+.public-btn-start {
+    background-color: #28a745;
+    color: white;
+    border: 2px solid #28a745;
+}
+
+.public-btn-start:hover:not(:disabled) {
+    background-color: #218838;
+    border-color: #218838;
+}
+
+/* Stop Button - Yellow */
+.public-btn-stop {
+    background-color: #ffc107;
+    color: #121212;
+    border: 2px solid #ffc107;
+}
+
+.public-btn-stop:hover:not(:disabled) {
+    background-color: #e0a800;
+    border-color: #e0a800;
+}
+
+/* Reset Button - Gray */
+.public-btn-reset {
+    background-color: #6c757d;
+    color: white;
+    border: 2px solid #6c757d;
+}
+
+.public-btn-reset:hover:not(:disabled) {
+    background-color: #5a6268;
+    border-color: #5a6268;
+}
+
+/* --------------------------
+   Responsive: Tablet & Mobile
+-------------------------- */
+@media (max-width: 900px) {
+    .public-timer-display {
+        font-size: 6rem;
+    }
+    
+    .public-preset-btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        min-width: 60px;
+    }
+    
+    .public-control-btn {
+        padding: 0.85rem 2rem;
+        font-size: 1.1rem;
+        min-width: 110px;
+    }
+}
+
+@media (max-width: 600px) {
+    .public-timer-panel {
+        padding: 1.5rem 1rem;
+        gap: 1.5rem;
+    }
+    
+    .public-timer-display {
+        font-size: 4rem;
+    }
+    
+    .public-timer-status {
+        font-size: 1rem;
+        letter-spacing: 2px;
+    }
+    
+    .public-timer-presets-row {
+        gap: 0.5rem;
+    }
+    
+    .public-preset-btn {
+        padding: 0.6rem 0.9rem;
+        font-size: 0.9rem;
+        min-width: 50px;
+    }
+    
+    .public-timer-controls-row {
+        gap: 0.75rem;
+    }
+    
+    .public-control-btn {
+        padding: 0.7rem 1.5rem;
+        font-size: 1rem;
+        min-width: 90px;
+        letter-spacing: 1px;
+    }
+}

@@ -23,7 +23,7 @@
         <!-- Main Content -->
         <main>
             <div class="dashboard-content">
-                
+
                 <!-- View Toggle Buttons -->
                 <div class="view-toggle-section">
                     <button type="button" id="btn-class-view" class="view-toggle-btn active">Class View</button>
@@ -108,6 +108,38 @@
             </div>
         </main>
 
+        <!-- ===================== -->
+        <!-- PUBLIC TIMER SECTION  -->
+        <!-- ===================== -->
+        <section class="public-timer-section">
+            <div class="public-timer-panel">
+                
+                <!-- Large Countdown Clock (Centered) -->
+                <div class="public-timer-clock-row">
+                    <div id="public-timer-display" class="public-timer-display">01:00</div>
+                    <div id="public-timer-status" class="public-timer-status">READY</div>
+                </div>
+                
+                <!-- Preset Time Buttons (Single Horizontal Row) -->
+                <div class="public-timer-presets-row">
+                    <button type="button" class="public-preset-btn" data-seconds="30">30s</button>
+                    <button type="button" class="public-preset-btn active" data-seconds="60">1m</button>
+                    <button type="button" class="public-preset-btn" data-seconds="90">1:30</button>
+                    <button type="button" class="public-preset-btn" data-seconds="120">2m</button>
+                    <button type="button" class="public-preset-btn" data-seconds="180">3m</button>
+                    <button type="button" class="public-preset-btn" data-seconds="600">10m</button>
+                </div>
+                
+                <!-- Control Buttons (Start / Stop / Reset) -->
+                <div class="public-timer-controls-row">
+                    <button type="button" id="public-btn-start" class="public-control-btn public-btn-start">Start</button>
+                    <button type="button" id="public-btn-stop" class="public-control-btn public-btn-stop" disabled>Stop</button>
+                    <button type="button" id="public-btn-reset" class="public-control-btn public-btn-reset">Reset</button>
+                </div>
+                
+            </div>
+        </section>
+
         <!-- Footer -->
         <footer>
             <p>GitWars Portal &copy; 2026</p>
@@ -124,6 +156,12 @@
         let currentView = "class"; // "class" or "overall"
         let selectedClass = 1;
         
+        // Timer State (LOCAL - not synced)
+        let timerInterval = null;      // Interval ID
+        let currentSeconds = 60;       // Current countdown value
+        let presetSeconds = 60;        // Last selected preset (for reset)
+        let isTimerRunning = false;    // Timer running state
+        
         // DOM Elements
         const btnClassView = document.getElementById("btn-class-view");
         const btnOverallView = document.getElementById("btn-overall-view");
@@ -133,6 +171,14 @@
         const jediLeaderboardBody = document.getElementById("jedi-leaderboard-body");
         const sithLeaderboardBody = document.getElementById("sith-leaderboard-body");
         const overallLeaderboardBody = document.getElementById("overall-leaderboard-body");
+        
+        // Timer DOM Elements
+        const publicTimerDisplay = document.getElementById("public-timer-display");
+        const publicTimerStatus = document.getElementById("public-timer-status");
+        const publicBtnStart = document.getElementById("public-btn-start");
+        const publicBtnStop = document.getElementById("public-btn-stop");
+        const publicBtnReset = document.getElementById("public-btn-reset");
+        const publicPresetButtons = document.querySelectorAll(".public-preset-btn");
         
         /**
          * Sort teams by score (descending)
@@ -277,6 +323,171 @@
             renderClassView();
         }
         
+        /* ========================
+           TIMER FUNCTIONS (LOCAL)
+        ======================== */
+        
+        /**
+         * Format seconds to MM:SS string
+         */
+        function formatTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return minutes.toString().padStart(2, "0") + ":" + seconds.toString().padStart(2, "0");
+        }
+        
+        /**
+         * Update the timer display
+         */
+        function updateTimerDisplay() {
+            publicTimerDisplay.textContent = formatTime(currentSeconds);
+            
+            // Warning class when time is low
+            if (currentSeconds <= 10 && currentSeconds > 0) {
+                publicTimerDisplay.classList.add("timer-warning");
+            } else {
+                publicTimerDisplay.classList.remove("timer-warning");
+            }
+            
+            // Finished class when time is up
+            if (currentSeconds === 0) {
+                publicTimerDisplay.classList.add("timer-finished");
+            } else {
+                publicTimerDisplay.classList.remove("timer-finished");
+            }
+        }
+        
+        /**
+         * Update timer status text
+         */
+        function setTimerStatus(status) {
+            publicTimerStatus.textContent = status;
+            publicTimerStatus.className = "public-timer-status";
+            
+            if (status === "RUNNING") {
+                publicTimerStatus.classList.add("status-running");
+            } else if (status === "PAUSED") {
+                publicTimerStatus.classList.add("status-paused");
+            } else if (status === "TIME UP!") {
+                publicTimerStatus.classList.add("status-finished");
+            }
+        }
+        
+        /**
+         * Update timer button states
+         */
+        function updateTimerButtons() {
+            if (isTimerRunning) {
+                publicBtnStart.disabled = true;
+                publicBtnStop.disabled = false;
+                publicBtnReset.disabled = true;
+            } else {
+                publicBtnStart.disabled = currentSeconds === 0;
+                publicBtnStop.disabled = true;
+                publicBtnReset.disabled = false;
+            }
+        }
+        
+        /**
+         * Start the timer countdown
+         */
+        function startTimer() {
+            if (isTimerRunning || currentSeconds <= 0) return;
+            
+            isTimerRunning = true;
+            setTimerStatus("RUNNING");
+            updateTimerButtons();
+            
+            // Clear any existing interval (safety)
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            timerInterval = setInterval(() => {
+                currentSeconds--;
+                updateTimerDisplay();
+                
+                if (currentSeconds <= 0) {
+                    stopTimer();
+                    setTimerStatus("TIME UP!");
+                }
+            }, 1000);
+        }
+        
+        /**
+         * Stop (pause) the timer
+         */
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            isTimerRunning = false;
+            
+            if (currentSeconds > 0) {
+                setTimerStatus("PAUSED");
+            }
+            
+            updateTimerButtons();
+        }
+        
+        /**
+         * Reset the timer to last preset value
+         */
+        function resetTimer() {
+            stopTimer();
+            currentSeconds = presetSeconds;
+            updateTimerDisplay();
+            setTimerStatus("READY");
+            updateTimerButtons();
+        }
+        
+        /**
+         * Set timer to a preset value
+         */
+        function setTimerPreset(seconds, btn) {
+            stopTimer();
+            presetSeconds = seconds;
+            currentSeconds = seconds;
+            
+            // Update active button state
+            publicPresetButtons.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            
+            updateTimerDisplay();
+            setTimerStatus("READY");
+            updateTimerButtons();
+        }
+        
+        /**
+         * Handle preset button clicks
+         */
+        function handlePresetClick(event) {
+            const btn = event.target.closest(".public-preset-btn");
+            if (!btn) return;
+            
+            const seconds = parseInt(btn.dataset.seconds, 10);
+            if (!isNaN(seconds) && seconds > 0) {
+                setTimerPreset(seconds, btn);
+            }
+        }
+        
+        /**
+         * Setup timer event listeners
+         */
+        function setupTimerListeners() {
+            publicBtnStart.addEventListener("click", startTimer);
+            publicBtnStop.addEventListener("click", stopTimer);
+            publicBtnReset.addEventListener("click", resetTimer);
+            
+            // Use updated class name for presets row
+            const presetsContainer = document.querySelector(".public-timer-presets-row");
+            if (presetsContainer) {
+                presetsContainer.addEventListener("click", handlePresetClick);
+            }
+        }
+        
         /**
          * Setup event listeners
          */
@@ -287,6 +498,9 @@
             
             // Class dropdown
             classDropdown.addEventListener("change", handleClassChange);
+            
+            // Timer controls
+            setupTimerListeners();
             
             // Logout button
             const logoutBtn = document.getElementById("logout-btn");
@@ -315,6 +529,10 @@
             
             // Setup event listeners
             setupEventListeners();
+            
+            // Initialize timer display
+            updateTimerDisplay();
+            updateTimerButtons();
             
             // Subscribe to real-time team updates
             subscribeToTeams((teams) => {

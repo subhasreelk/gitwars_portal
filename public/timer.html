@@ -12,17 +12,44 @@
         <header>
             <div class="header-content">
                 <h1>GitWars Timer</h1>
+                <div class="user-info">
+                    <span>Logged in as: <span id="username-display" class="username"></span></span>
+                    <span class="role-badge role-admin">ADMIN</span>
+                    <button id="logout-btn" class="btn btn-logout">Logout</button>
+                </div>
             </div>
         </header>
 
         <!-- Main Content -->
         <main>
-            <div class="dashboard-content">
-                <!-- Placeholder for timer -->
-                <div class="placeholder-section">
-                    <h3>Timer Coming Soon</h3>
-                    <p>The competition timer will be implemented in a future phase.</p>
+            <div class="timer-content">
+                
+                <!-- Timer Display -->
+                <div class="timer-display-section">
+                    <div id="timer-display" class="timer-display">01:00</div>
+                    <div id="timer-status" class="timer-status">READY</div>
                 </div>
+
+                <!-- Preset Time Buttons -->
+                <div class="timer-presets-section">
+                    <h3>Preset Times</h3>
+                    <div class="preset-buttons">
+                        <button type="button" class="preset-btn" data-seconds="30">30 sec</button>
+                        <button type="button" class="preset-btn active" data-seconds="60">1 min</button>
+                        <button type="button" class="preset-btn" data-seconds="90">1:30</button>
+                        <button type="button" class="preset-btn" data-seconds="120">2 min</button>
+                        <button type="button" class="preset-btn" data-seconds="180">3 min</button>
+                        <button type="button" class="preset-btn" data-seconds="600">10 min</button>
+                    </div>
+                </div>
+
+                <!-- Timer Controls -->
+                <div class="timer-controls-section">
+                    <button type="button" id="btn-start" class="control-btn btn-start">Start</button>
+                    <button type="button" id="btn-stop" class="control-btn btn-stop" disabled>Stop</button>
+                    <button type="button" id="btn-reset" class="control-btn btn-reset">Reset</button>
+                </div>
+
             </div>
         </main>
 
@@ -31,5 +58,248 @@
             <p>GitWars Portal &copy; 2026</p>
         </footer>
     </div>
+
+    <!-- Page Script -->
+    <script type="module">
+        import { protectPage, getUsername, clearSession } from "./js/utils.js";
+        
+        // Timer State
+        let timerInterval = null;      // Interval ID
+        let currentSeconds = 60;       // Current countdown value
+        let presetSeconds = 60;        // Last selected preset (for reset)
+        let isRunning = false;         // Timer running state
+        
+        // DOM Elements
+        const timerDisplay = document.getElementById("timer-display");
+        const timerStatus = document.getElementById("timer-status");
+        const btnStart = document.getElementById("btn-start");
+        const btnStop = document.getElementById("btn-stop");
+        const btnReset = document.getElementById("btn-reset");
+        const presetButtons = document.querySelectorAll(".preset-btn");
+        
+        /**
+         * Format seconds to MM:SS string
+         * @param {number} totalSeconds - Total seconds to format
+         * @returns {string} - Formatted time string
+         */
+        function formatTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            
+            const mm = minutes.toString().padStart(2, "0");
+            const ss = seconds.toString().padStart(2, "0");
+            
+            return `${mm}:${ss}`;
+        }
+        
+        /**
+         * Update the timer display
+         */
+        function updateDisplay() {
+            timerDisplay.textContent = formatTime(currentSeconds);
+            
+            // Add warning class when time is low
+            if (currentSeconds <= 10 && currentSeconds > 0) {
+                timerDisplay.classList.add("timer-warning");
+            } else {
+                timerDisplay.classList.remove("timer-warning");
+            }
+            
+            // Add finished class when time is up
+            if (currentSeconds === 0) {
+                timerDisplay.classList.add("timer-finished");
+            } else {
+                timerDisplay.classList.remove("timer-finished");
+            }
+        }
+        
+        /**
+         * Update timer status text
+         * @param {string} status - Status text to display
+         */
+        function setStatus(status) {
+            timerStatus.textContent = status;
+            timerStatus.className = "timer-status";
+            
+            if (status === "RUNNING") {
+                timerStatus.classList.add("status-running");
+            } else if (status === "PAUSED") {
+                timerStatus.classList.add("status-paused");
+            } else if (status === "TIME UP!") {
+                timerStatus.classList.add("status-finished");
+            }
+        }
+        
+        /**
+         * Update button states based on timer state
+         */
+        function updateButtons() {
+            if (isRunning) {
+                btnStart.disabled = true;
+                btnStop.disabled = false;
+                btnReset.disabled = true;
+            } else {
+                btnStart.disabled = currentSeconds === 0;
+                btnStop.disabled = true;
+                btnReset.disabled = false;
+            }
+        }
+        
+        /**
+         * Start the timer countdown
+         */
+        function startTimer() {
+            // Prevent multiple intervals
+            if (isRunning || currentSeconds <= 0) return;
+            
+            isRunning = true;
+            setStatus("RUNNING");
+            updateButtons();
+            
+            // Clear any existing interval (safety)
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            timerInterval = setInterval(() => {
+                currentSeconds--;
+                updateDisplay();
+                
+                // Check if timer reached zero
+                if (currentSeconds <= 0) {
+                    stopTimer();
+                    setStatus("TIME UP!");
+                }
+            }, 1000);
+            
+            console.log("Timer started.");
+        }
+        
+        /**
+         * Stop (pause) the timer
+         */
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            isRunning = false;
+            
+            if (currentSeconds > 0) {
+                setStatus("PAUSED");
+            }
+            
+            updateButtons();
+            console.log("Timer stopped.");
+        }
+        
+        /**
+         * Reset the timer to last preset value
+         */
+        function resetTimer() {
+            // Stop if running
+            stopTimer();
+            
+            // Reset to preset value
+            currentSeconds = presetSeconds;
+            updateDisplay();
+            setStatus("READY");
+            updateButtons();
+            
+            console.log(`Timer reset to ${formatTime(presetSeconds)}.`);
+        }
+        
+        /**
+         * Set timer to a preset value
+         * @param {number} seconds - Preset seconds value
+         * @param {HTMLElement} btn - The clicked button element
+         */
+        function setPreset(seconds, btn) {
+            // Stop timer if running
+            stopTimer();
+            
+            // Update preset and current time
+            presetSeconds = seconds;
+            currentSeconds = seconds;
+            
+            // Update active button state
+            presetButtons.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            
+            // Update display
+            updateDisplay();
+            setStatus("READY");
+            updateButtons();
+            
+            console.log(`Preset set to ${formatTime(seconds)}.`);
+        }
+        
+        /**
+         * Handle preset button clicks
+         */
+        function handlePresetClick(event) {
+            const btn = event.target.closest(".preset-btn");
+            if (!btn) return;
+            
+            const seconds = parseInt(btn.dataset.seconds, 10);
+            if (!isNaN(seconds) && seconds > 0) {
+                setPreset(seconds, btn);
+            }
+        }
+        
+        /**
+         * Setup event listeners
+         */
+        function setupEventListeners() {
+            // Control buttons
+            btnStart.addEventListener("click", startTimer);
+            btnStop.addEventListener("click", stopTimer);
+            btnReset.addEventListener("click", resetTimer);
+            
+            // Preset buttons (event delegation)
+            const presetsContainer = document.querySelector(".preset-buttons");
+            if (presetsContainer) {
+                presetsContainer.addEventListener("click", handlePresetClick);
+            }
+            
+            // Logout button
+            const logoutBtn = document.getElementById("logout-btn");
+            if (logoutBtn) {
+                logoutBtn.addEventListener("click", () => {
+                    clearSession();
+                    window.location.href = "login.html";
+                });
+            }
+        }
+        
+        /**
+         * Initialize timer page
+         */
+        function initTimerPage() {
+            // Check page protection - only ADMIN role can access
+            if (!protectPage("ADMIN")) {
+                return; // Will redirect to login
+            }
+            
+            // Display username
+            const usernameDisplay = document.getElementById("username-display");
+            if (usernameDisplay) {
+                usernameDisplay.textContent = getUsername();
+            }
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Initialize display
+            updateDisplay();
+            updateButtons();
+            
+            console.log("Timer page initialized.");
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener("DOMContentLoaded", initTimerPage);
+    </script>
 </body>
 </html>
