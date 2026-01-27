@@ -898,6 +898,30 @@ footer {
     padding: 2rem;
 }
 
+/* Animated row movement + rank glow */
+.leaderboard-row {
+    position: relative;
+    transition: transform 0.38s ease-in-out, background-color 0.45s ease-in-out, box-shadow 0.45s ease-in-out;
+    will-change: transform;
+}
+
+.leaderboard-row.rank-up {
+    background-color: rgba(76, 175, 80, 0.12);
+    box-shadow: 0 0 18px rgba(76, 175, 80, 0.35);
+}
+
+.leaderboard-row.rank-down {
+    background-color: rgba(255, 77, 77, 0.12);
+    box-shadow: 0 0 18px rgba(255, 77, 77, 0.35);
+}
+
+@media (max-width: 520px) {
+    .leaderboard-row {
+        transition: none;
+        box-shadow: none;
+    }
+}
+
 /* Responsive for smaller screens */
 @media (max-width: 768px) {
     .dual-leaderboard {

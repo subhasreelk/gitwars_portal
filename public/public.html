@@ -181,6 +181,115 @@
         const publicBtnStop = document.getElementById("public-btn-stop");
         const publicBtnReset = document.getElementById("public-btn-reset");
         const publicPresetButtons = document.querySelectorAll(".public-preset-btn");
+
+        // Animation state (per table body)
+        const rankMemory = new WeakMap();
+
+        function shouldAnimateRows() {
+            return !window.matchMedia("(max-width: 520px)").matches;
+        }
+
+        function getRankState(tbody) {
+            if (!rankMemory.has(tbody)) {
+                rankMemory.set(tbody, new Map());
+            }
+            return rankMemory.get(tbody);
+        }
+
+        function resetRankState(tbody) {
+            rankMemory.set(tbody, new Map());
+        }
+
+        function captureRowPositions(tbody) {
+            const positions = new Map();
+            tbody.querySelectorAll("tr.leaderboard-row").forEach((row) => {
+                positions.set(row.dataset.teamId, row.getBoundingClientRect());
+            });
+            return positions;
+        }
+
+        function applyFlipAnimation(tbody, previousPositions, rankState) {
+            const rows = Array.from(tbody.querySelectorAll("tr.leaderboard-row"));
+
+            rows.forEach((row, index) => {
+                const key = row.dataset.teamId;
+                const previousRect = previousPositions.get(key);
+                const newRect = row.getBoundingClientRect();
+
+                if (previousRect && (previousRect.top !== newRect.top || previousRect.left !== newRect.left)) {
+                    const deltaX = previousRect.left - newRect.left;
+                    const deltaY = previousRect.top - newRect.top;
+
+                    row.style.transition = "none";
+                    row.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+                    requestAnimationFrame(() => {
+                        row.style.transition = "";
+                        row.style.transform = "";
+                    });
+                }
+
+                const previousRank = rankState.get(key);
+                const newRank = index + 1;
+
+                row.classList.remove("rank-up", "rank-down");
+                if (previousRank && previousRank !== newRank) {
+                    if (previousRank > newRank) {
+                        row.classList.add("rank-up");
+                    } else {
+                        row.classList.add("rank-down");
+                    }
+
+                    setTimeout(() => {
+                        row.classList.remove("rank-up", "rank-down");
+                    }, 800);
+                }
+
+                rankState.set(key, newRank);
+            });
+        }
+
+        function renderTableWithAnimation(tbody, teams, buildRow) {
+            if (teams.length === 0) {
+                tbody.innerHTML = `
+                    <tr class="empty-row">
+                        <td colspan="${tbody.dataset.columns || 3}">No teams registered</td>
+                    </tr>
+                `;
+                resetRankState(tbody);
+                return;
+            }
+
+            const animate = shouldAnimateRows();
+            const previousPositions = animate ? captureRowPositions(tbody) : null;
+            const rankState = getRankState(tbody);
+
+            const fragment = document.createDocumentFragment();
+
+            teams.forEach((team, index) => {
+                let row = tbody.querySelector(`tr[data-team-id="${team.id}"]`);
+                if (!row) {
+                    row = document.createElement("tr");
+                    row.className = "leaderboard-row";
+                }
+
+                row.dataset.teamId = team.id;
+                row.dataset.role = team.role;
+                row.dataset.teamClass = team.class;
+
+                buildRow(row, team, index);
+                fragment.appendChild(row);
+            });
+
+            tbody.innerHTML = "";
+            tbody.appendChild(fragment);
+
+            if (animate && previousPositions) {
+                requestAnimationFrame(() => applyFlipAnimation(tbody, previousPositions, rankState));
+            } else {
+                teams.forEach((team, index) => rankState.set(team.id, index + 1));
+            }
+        }
         
         /**
          * Sort teams by score (descending)
@@ -211,28 +320,24 @@
          * Render a single leaderboard panel (JEDI or SITH)
          */
         function renderLeaderboardPanel(tbody, teams, role) {
-            tbody.innerHTML = "";
-            
             if (teams.length === 0) {
                 tbody.innerHTML = `
                     <tr class="empty-row">
                         <td colspan="3">No ${role} teams in Class ${selectedClass}</td>
                     </tr>
                 `;
+                resetRankState(tbody);
                 return;
             }
-            
-            teams.forEach((team, index) => {
-                const row = document.createElement("tr");
-                row.className = "leaderboard-row";
-                
+
+            tbody.dataset.columns = 3;
+
+            renderTableWithAnimation(tbody, teams, (row, team, index) => {
                 row.innerHTML = `
                     <td class="col-rank">${index + 1}</td>
                     <td class="col-team-name">${team.teamName}</td>
                     <td class="col-score">${team.score}</td>
                 `;
-                
-                tbody.appendChild(row);
             });
         }
         
@@ -240,26 +345,13 @@
          * Render the Overall View leaderboard
          */
         function renderOverallView() {
-            overallLeaderboardBody.innerHTML = "";
-            
             // Sort all teams by score
             const sortedTeams = sortByScore(allTeams);
-            
-            if (sortedTeams.length === 0) {
-                overallLeaderboardBody.innerHTML = `
-                    <tr class="empty-row">
-                        <td colspan="5">No teams registered</td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            sortedTeams.forEach((team, index) => {
-                const row = document.createElement("tr");
-                row.className = "leaderboard-row";
-                
+
+            overallLeaderboardBody.dataset.columns = 5;
+
+            renderTableWithAnimation(overallLeaderboardBody, sortedTeams, (row, team, index) => {
                 const roleClass = team.role === "JEDI" ? "role-jedi" : "role-sith";
-                
                 row.innerHTML = `
                     <td class="col-rank">${index + 1}</td>
                     <td class="col-team-name">${team.teamName}</td>
@@ -267,8 +359,6 @@
                     <td class="col-role ${roleClass}">${team.role}</td>
                     <td class="col-score">${team.score}</td>
                 `;
-                
-                overallLeaderboardBody.appendChild(row);
             });
         }
         
@@ -322,6 +412,8 @@
          */
         function handleClassChange() {
             selectedClass = parseInt(classDropdown.value, 10);
+            resetRankState(jediLeaderboardBody);
+            resetRankState(sithLeaderboardBody);
             renderClassView();
         }
         
