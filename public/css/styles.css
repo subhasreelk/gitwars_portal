@@ -314,6 +314,7 @@ footer {
     gap: 1rem;
     align-items: flex-end;
     flex-wrap: wrap;
+    margin-bottom: 1rem;
 }
 
 .form-group-small {
@@ -353,11 +354,12 @@ footer {
     text-align: center;
 }
 
-/* Name validation status */
+/* Name validation status - positioned absolutely to not affect layout */
 .name-status {
-    display: block;
+    position: absolute;
+    bottom: -18px;
+    left: 0;
     font-size: 0.75rem;
-    margin-top: 0.25rem;
     height: 1rem;
 }
 
@@ -898,27 +900,65 @@ footer {
     padding: 2rem;
 }
 
-/* Animated row movement + rank glow */
+/* =====================================================
+   LEADERBOARD ROW ANIMATION STYLES
+   Provides smooth FLIP animation for rank changes
+   Triggered by live Firestore score updates
+===================================================== */
+
+/* Base row styling with transform support */
 .leaderboard-row {
     position: relative;
-    transition: transform 0.38s ease-in-out, background-color 0.45s ease-in-out, box-shadow 0.45s ease-in-out;
+    transition: transform 0.5s ease-in-out, 
+                background-color 0.4s ease-out, 
+                box-shadow 0.4s ease-out;
     will-change: transform;
+    backface-visibility: hidden;
 }
 
+/* Moving UP - Green/Gold glow effect */
 .leaderboard-row.rank-up {
-    background-color: rgba(76, 175, 80, 0.12);
-    box-shadow: 0 0 18px rgba(76, 175, 80, 0.35);
+    background-color: rgba(76, 175, 80, 0.2) !important;
+    box-shadow: 
+        0 0 20px rgba(76, 175, 80, 0.4),
+        0 0 40px rgba(76, 175, 80, 0.2),
+        inset 0 0 15px rgba(76, 175, 80, 0.1) !important;
 }
 
+.leaderboard-row.rank-up td {
+    color: #90ee90 !important;
+    text-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+    transition: color 0.3s ease-out, text-shadow 0.3s ease-out;
+}
+
+/* Moving DOWN - Red glow effect */
 .leaderboard-row.rank-down {
-    background-color: rgba(255, 77, 77, 0.12);
-    box-shadow: 0 0 18px rgba(255, 77, 77, 0.35);
+    background-color: rgba(255, 77, 77, 0.2) !important;
+    box-shadow: 
+        0 0 20px rgba(255, 77, 77, 0.4),
+        0 0 40px rgba(255, 77, 77, 0.2),
+        inset 0 0 15px rgba(255, 77, 77, 0.1) !important;
 }
 
-@media (max-width: 520px) {
+.leaderboard-row.rank-down td {
+    color: #ff9999 !important;
+    text-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
+    transition: color 0.3s ease-out, text-shadow 0.3s ease-out;
+}
+
+/* Disable animations on small screens for performance */
+@media (max-width: 480px) {
     .leaderboard-row {
-        transition: none;
-        box-shadow: none;
+        transition: none !important;
+        transform: none !important;
+    }
+    .leaderboard-row.rank-up,
+    .leaderboard-row.rank-down {
+        box-shadow: none !important;
+    }
+    .leaderboard-row.rank-up td,
+    .leaderboard-row.rank-down td {
+        text-shadow: none !important;
     }
 }
 

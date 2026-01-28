@@ -1,0 +1,1275 @@
+/**
+ * starwars-theme.css
+ * Star Wars Theme Overlay for GitWars Portal
+ * 
+ * Animated starfield, glassmorphism panels, neon glows,
+ * floating characters, and cinematic visuals.
+ */
+
+/* ========================
+   STAR WARS FONT IMPORT
+======================== */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+/* ========================
+   CSS VARIABLES - STAR WARS PALETTE
+======================== */
+:root {
+    /* Core colors */
+    --sw-bg-dark: #0a0a0a;
+    --sw-bg-navy: #0d1b2a;
+    --sw-bg-panel: rgba(13, 27, 42, 0.85);
+    
+    /* Jedi colors */
+    --sw-jedi-primary: #00d4ff;
+    --sw-jedi-glow: rgba(0, 212, 255, 0.6);
+    --sw-jedi-soft: rgba(0, 212, 255, 0.15);
+    
+    /* Sith colors */
+    --sw-sith-primary: #ff3333;
+    --sw-sith-glow: rgba(255, 51, 51, 0.6);
+    --sw-sith-soft: rgba(255, 51, 51, 0.15);
+    
+    /* Accent colors */
+    --sw-gold: #ffd700;
+    --sw-gold-glow: rgba(255, 215, 0, 0.5);
+    --sw-gold-soft: rgba(255, 215, 0, 0.15);
+    
+    /* Text colors */
+    --sw-text-primary: #e8e8e8;
+    --sw-text-muted: #8892a0;
+    --sw-text-dim: #5a6270;
+    
+    /* Glass effect */
+    --sw-glass-bg: rgba(20, 30, 48, 0.75);
+    --sw-glass-border: rgba(255, 255, 255, 0.1);
+    --sw-glass-blur: blur(12px);
+    
+    /* Star Wars Font */
+    --sw-font: 'Orbitron', 'Segoe UI', sans-serif;
+}
+
+/* ========================
+   GLOBAL FONT OVERRIDES
+======================== */
+h1, h2, h3, h4, h5, h6,
+.panel-title,
+.overall-title,
+.view-toggle-btn,
+.btn,
+.control-btn,
+.preset-btn,
+.public-preset-btn,
+.public-control-btn,
+.timer-display,
+.public-timer-display,
+.timer-status,
+.public-timer-status,
+.role-badge,
+.toggle-btn,
+.filter-label,
+header h1,
+.login-box h1,
+.team-form-section h3,
+.team-table-section h3,
+.welcome-message h2,
+.timer-presets-section h3 {
+    font-family: var(--sw-font) !important;
+    letter-spacing: 2px;
+}
+
+/* ========================
+   ANIMATED STARFIELD BACKGROUND
+======================== */
+body {
+    background: #000000;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background: #000000;
+}
+
+/* Star layers */
+.starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.starfield .stars {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, white, transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, white, transparent),
+        radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(1px 1px at 230px 80px, white, transparent),
+        radial-gradient(2px 2px at 300px 150px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 370px 50px, white, transparent),
+        radial-gradient(2px 2px at 450px 180px, rgba(255,255,255,0.8), transparent);
+    background-size: 500px 200px;
+    animation: twinkle 8s ease-in-out infinite alternate;
+}
+
+.starfield .stars-layer-2 {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(1px 1px at 50px 100px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 120px 20px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(2px 2px at 200px 160px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 280px 90px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 350px 130px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(2px 2px at 420px 60px, rgba(255,255,255,0.5), transparent);
+    background-size: 450px 180px;
+    animation: twinkle 12s ease-in-out 2s infinite alternate-reverse;
+}
+
+.starfield .stars-layer-3 {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(1px 1px at 80px 50px, rgba(200,220,255,0.5), transparent),
+        radial-gradient(1px 1px at 180px 140px, rgba(255,200,200,0.4), transparent),
+        radial-gradient(1px 1px at 260px 30px, rgba(200,255,200,0.5), transparent),
+        radial-gradient(1px 1px at 340px 110px, rgba(255,255,200,0.4), transparent),
+        radial-gradient(1px 1px at 400px 170px, rgba(200,200,255,0.5), transparent);
+    background-size: 480px 190px;
+    animation: drift 25s linear infinite;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+@keyframes drift {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-480px); }
+}
+
+/* ========================
+   FLYING OBJECTS ANIMATIONS
+======================== */
+.flying-objects-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.flying-object {
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0.7;
+    filter: drop-shadow(0 0 8px currentColor);
+}
+
+/* Droid flying across */
+.flying-droid {
+    color: #ffd700;
+    animation: flyAcross 18s linear infinite;
+}
+
+.flying-droid-2 {
+    color: #4da6ff;
+    animation: flyAcross 25s linear 8s infinite;
+    font-size: 1.2rem;
+}
+
+.flying-droid-3 {
+    color: #ff9933;
+    animation: flyAcrossReverse 22s linear 4s infinite;
+    font-size: 1rem;
+}
+
+/* Rocket/ship flying */
+.flying-rocket {
+    color: #00ffcc;
+    animation: flyDiagonal 15s linear infinite;
+    font-size: 1.8rem;
+}
+
+.flying-rocket-2 {
+    color: #ff6666;
+    animation: flyDiagonalReverse 20s linear 6s infinite;
+    font-size: 1.4rem;
+}
+
+/* Shooting stars */
+.shooting-star {
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.9), transparent);
+    animation: shootingStar 4s linear infinite;
+    opacity: 0;
+}
+
+.shooting-star-2 {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(200,220,255,0.8), transparent);
+    animation: shootingStar 5s linear 2s infinite;
+    opacity: 0;
+}
+
+.shooting-star-3 {
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,220,150,0.9), transparent);
+    animation: shootingStar 6s linear 4s infinite;
+    opacity: 0;
+}
+
+/* Floating mini asteroids */
+.mini-asteroid {
+    color: #888;
+    animation: floatAcross 30s linear infinite;
+    font-size: 0.8rem;
+}
+
+.mini-asteroid-2 {
+    color: #666;
+    animation: floatAcross 35s linear 10s infinite;
+    font-size: 0.6rem;
+}
+
+@keyframes flyAcross {
+    0% {
+        left: -50px;
+        top: 15%;
+        transform: rotate(15deg);
+    }
+    100% {
+        left: 110%;
+        top: 25%;
+        transform: rotate(15deg);
+    }
+}
+
+@keyframes flyAcrossReverse {
+    0% {
+        right: -50px;
+        left: auto;
+        top: 60%;
+        transform: rotate(-10deg) scaleX(-1);
+    }
+    100% {
+        right: 110%;
+        left: auto;
+        top: 50%;
+        transform: rotate(-10deg) scaleX(-1);
+    }
+}
+
+@keyframes flyDiagonal {
+    0% {
+        left: -50px;
+        top: 80%;
+        transform: rotate(-35deg);
+    }
+    100% {
+        left: 110%;
+        top: 10%;
+        transform: rotate(-35deg);
+    }
+}
+
+@keyframes flyDiagonalReverse {
+    0% {
+        right: -50px;
+        left: auto;
+        top: 5%;
+        transform: rotate(40deg) scaleX(-1);
+    }
+    100% {
+        right: 110%;
+        left: auto;
+        top: 70%;
+        transform: rotate(40deg) scaleX(-1);
+    }
+}
+
+@keyframes shootingStar {
+    0% {
+        left: 80%;
+        top: 5%;
+        opacity: 0;
+        transform: rotate(-45deg);
+    }
+    5% {
+        opacity: 1;
+    }
+    30% {
+        left: 20%;
+        top: 35%;
+        opacity: 0;
+    }
+    100% {
+        left: 20%;
+        top: 35%;
+        opacity: 0;
+    }
+}
+
+@keyframes floatAcross {
+    0% {
+        left: -30px;
+        top: 40%;
+        transform: rotate(0deg);
+    }
+    100% {
+        left: 110%;
+        top: 45%;
+        transform: rotate(360deg);
+    }
+}
+
+/* ========================
+   FLOATING CHARACTER ANIMATIONS
+======================== */
+.sw-character {
+    position: fixed;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0.9;
+    filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.3));
+}
+
+.sw-character.jedi {
+    filter: drop-shadow(0 0 20px var(--sw-jedi-glow));
+}
+
+.sw-character.sith {
+    filter: drop-shadow(0 0 20px var(--sw-sith-glow));
+}
+
+.sw-character.droid {
+    filter: drop-shadow(0 0 15px var(--sw-gold-glow));
+}
+
+.sw-character img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Float animation */
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-10px) rotate(1deg); }
+    50% { transform: translateY(-5px) rotate(0deg); }
+    75% { transform: translateY(-12px) rotate(-1deg); }
+}
+
+@keyframes floatSlow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.sw-character.float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.sw-character.float-slow {
+    animation: floatSlow 8s ease-in-out infinite;
+}
+
+/* Character positioning - Login Page */
+.sw-char-login-left {
+    left: 3%;
+    bottom: 8%;
+    width: 220px;
+}
+
+.sw-char-login-right {
+    right: 3%;
+    bottom: 8%;
+    width: 220px;
+}
+
+/* Character positioning - Public Page */
+.sw-char-jedi-panel {
+    position: absolute;
+    right: -80px;
+    bottom: 10px;
+    width: 150px;
+}
+
+.sw-char-sith-panel {
+    position: absolute;
+    left: -80px;
+    bottom: 10px;
+    width: 150px;
+}
+
+/* Character positioning - Admin Page */
+.sw-char-admin {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    width: 140px;
+    z-index: 10;
+}
+
+/* ========================
+   STAR WARS LOGO
+======================== */
+.sw-logo-container {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-top: 1rem;
+}
+
+.sw-logo {
+    max-width: 280px;
+    height: auto;
+    filter: drop-shadow(0 0 20px var(--sw-gold-glow));
+    animation: logoGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes logoGlow {
+    0% { filter: drop-shadow(0 0 15px var(--sw-gold-glow)); }
+    100% { filter: drop-shadow(0 0 30px var(--sw-gold-glow)); }
+}
+
+/* ========================
+   GLASSMORPHISM PANELS
+======================== */
+.sw-glass-panel {
+    background: var(--sw-glass-bg);
+    backdrop-filter: var(--sw-glass-blur);
+    -webkit-backdrop-filter: var(--sw-glass-blur);
+    border: 1px solid var(--sw-glass-border);
+    border-radius: 16px;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.sw-glass-panel.jedi-glow {
+    border-color: rgba(0, 212, 255, 0.3);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 20px var(--sw-jedi-soft),
+        inset 0 1px 0 rgba(0, 212, 255, 0.1);
+}
+
+.sw-glass-panel.sith-glow {
+    border-color: rgba(255, 51, 51, 0.3);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 20px var(--sw-sith-soft),
+        inset 0 1px 0 rgba(255, 51, 51, 0.1);
+}
+
+.sw-glass-panel.gold-glow {
+    border-color: rgba(255, 215, 0, 0.3);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 20px var(--sw-gold-soft),
+        inset 0 1px 0 rgba(255, 215, 0, 0.1);
+}
+
+/* ========================
+   NEON GLOW BUTTONS
+======================== */
+.sw-btn {
+    position: relative;
+    border-radius: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.sw-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.sw-btn:hover::before {
+    left: 100%;
+}
+
+/* Gold button (primary actions) */
+.sw-btn-gold {
+    background: linear-gradient(135deg, #ffd700, #ffb800);
+    color: #0a0a12;
+    border: none;
+    box-shadow: 0 0 15px var(--sw-gold-soft);
+}
+
+.sw-btn-gold:hover {
+    box-shadow: 0 0 25px var(--sw-gold-glow);
+    transform: translateY(-2px);
+}
+
+/* Jedi button */
+.sw-btn-jedi {
+    background: linear-gradient(135deg, rgba(0, 180, 220, 0.3), rgba(0, 212, 255, 0.2));
+    color: var(--sw-jedi-primary);
+    border: 1px solid var(--sw-jedi-primary);
+    box-shadow: 0 0 10px var(--sw-jedi-soft);
+}
+
+.sw-btn-jedi:hover {
+    background: linear-gradient(135deg, rgba(0, 180, 220, 0.5), rgba(0, 212, 255, 0.3));
+    box-shadow: 0 0 20px var(--sw-jedi-glow);
+}
+
+/* Sith button */
+.sw-btn-sith {
+    background: linear-gradient(135deg, rgba(200, 40, 40, 0.3), rgba(255, 51, 51, 0.2));
+    color: var(--sw-sith-primary);
+    border: 1px solid var(--sw-sith-primary);
+    box-shadow: 0 0 10px var(--sw-sith-soft);
+}
+
+.sw-btn-sith:hover {
+    background: linear-gradient(135deg, rgba(200, 40, 40, 0.5), rgba(255, 51, 51, 0.3));
+    box-shadow: 0 0 20px var(--sw-sith-glow);
+}
+
+/* ========================
+   ENHANCED LOGIN PAGE
+======================== */
+.sw-login-container {
+    position: relative;
+    z-index: 10;
+}
+
+.sw-login-box {
+    background: var(--sw-glass-bg);
+    backdrop-filter: var(--sw-glass-blur);
+    -webkit-backdrop-filter: var(--sw-glass-blur);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    border-radius: 20px;
+    box-shadow: 
+        0 15px 50px rgba(0, 0, 0, 0.5),
+        0 0 30px var(--sw-gold-soft),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.sw-login-box h1 {
+    text-shadow: 0 0 20px var(--sw-gold-glow);
+}
+
+.sw-login-input {
+    background: rgba(10, 10, 18, 0.8) !important;
+    border: 1px solid rgba(255, 215, 0, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+.sw-login-input:focus {
+    border-color: var(--sw-gold) !important;
+    box-shadow: 0 0 15px var(--sw-gold-soft) !important;
+}
+
+/* ========================
+   ENHANCED HEADER
+======================== */
+header {
+    background: linear-gradient(180deg, rgba(13, 27, 42, 0.95), rgba(10, 10, 18, 0.9)) !important;
+    border-bottom: 2px solid var(--sw-gold) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+header h1 {
+    text-shadow: 0 0 15px var(--sw-gold-glow);
+}
+
+/* ========================
+   ENHANCED LEADERBOARD PANELS
+======================== */
+.jedi-panel {
+    background: var(--sw-glass-bg) !important;
+    backdrop-filter: var(--sw-glass-blur);
+    -webkit-backdrop-filter: var(--sw-glass-blur);
+    border: 2px solid var(--sw-jedi-primary) !important;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 30px var(--sw-jedi-soft),
+        inset 0 1px 0 rgba(0, 212, 255, 0.1) !important;
+    position: relative;
+    overflow: visible;
+}
+
+.sith-panel {
+    background: var(--sw-glass-bg) !important;
+    backdrop-filter: var(--sw-glass-blur);
+    -webkit-backdrop-filter: var(--sw-glass-blur);
+    border: 2px solid var(--sw-sith-primary) !important;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 30px var(--sw-sith-soft),
+        inset 0 1px 0 rgba(255, 51, 51, 0.1) !important;
+    position: relative;
+    overflow: visible;
+}
+
+.jedi-title {
+    color: var(--sw-jedi-primary) !important;
+    text-shadow: 0 0 25px var(--sw-jedi-glow) !important;
+}
+
+.sith-title {
+    color: var(--sw-sith-primary) !important;
+    text-shadow: 0 0 25px var(--sw-sith-glow) !important;
+}
+
+/* Enhanced table rows */
+.leaderboard-table tbody tr {
+    background: transparent;
+    transition: background-color 0.3s ease;
+}
+
+.leaderboard-table tbody tr:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.leaderboard-table tbody tr:hover {
+    background: rgba(255, 215, 0, 0.08) !important;
+}
+
+.jedi-panel .leaderboard-table tbody tr:hover {
+    background: var(--sw-jedi-soft) !important;
+}
+
+.sith-panel .leaderboard-table tbody tr:hover {
+    background: var(--sw-sith-soft) !important;
+}
+
+/* ========================
+   ENHANCED VIEW TOGGLE
+======================== */
+.view-toggle-btn {
+    background: var(--sw-glass-bg) !important;
+    border: 2px solid rgba(255, 215, 0, 0.3) !important;
+    color: var(--sw-text-muted) !important;
+    backdrop-filter: var(--sw-glass-blur);
+    -webkit-backdrop-filter: var(--sw-glass-blur);
+    transition: all 0.3s ease !important;
+}
+
+.view-toggle-btn:hover {
+    border-color: var(--sw-gold) !important;
+    color: var(--sw-gold) !important;
+    box-shadow: 0 0 15px var(--sw-gold-soft);
+}
+
+.view-toggle-btn.active {
+    background: linear-gradient(135deg, #ffd700, #ffb800) !important;
+    color: #0a0a12 !important;
+    border-color: var(--sw-gold) !important;
+    box-shadow: 0 0 20px var(--sw-gold-glow) !important;
+}
+
+/* ========================
+   ENHANCED ADMIN PANELS
+======================== */
+.team-form-section,
+.team-table-section {
+    background: var(--sw-glass-bg) !important;
+    backdrop-filter: var(--sw-glass-blur);
+    -webkit-backdrop-filter: var(--sw-glass-blur);
+    border: 1px solid rgba(255, 215, 0, 0.2) !important;
+    border-radius: 16px !important;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 20px var(--sw-gold-soft);
+}
+
+.team-form-section h3,
+.team-table-section h3 {
+    text-shadow: 0 0 10px var(--sw-gold-glow);
+}
+
+/* Enhanced inputs */
+.form-group input,
+.form-group select {
+    background: rgba(10, 10, 18, 0.8) !important;
+    border: 1px solid rgba(255, 215, 0, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--sw-gold) !important;
+    box-shadow: 0 0 12px var(--sw-gold-soft) !important;
+}
+
+/* Enhanced filter toggles */
+.filter-controls {
+    background: rgba(10, 10, 18, 0.6) !important;
+    border-radius: 10px !important;
+}
+
+.toggle-btn {
+    transition: all 0.3s ease !important;
+}
+
+.toggle-btn.toggle-jedi:hover,
+.toggle-btn.toggle-jedi.active {
+    box-shadow: 0 0 15px var(--sw-jedi-soft) !important;
+}
+
+.toggle-btn.toggle-sith:hover,
+.toggle-btn.toggle-sith.active {
+    box-shadow: 0 0 15px var(--sw-sith-soft) !important;
+}
+
+/* ========================
+   ENHANCED TIMER DISPLAY - BATTLE CLOCK STYLE
+======================== */
+.public-timer-section {
+    width: 100%;
+    padding: 0 1rem 2rem 1rem;
+    box-sizing: border-box;
+}
+
+/* Battle Clock Title */
+.public-timer-section::before {
+    content: 'BATTLE CLOCK';
+    display: block;
+    text-align: center;
+    font-family: var(--sw-font);
+    font-size: clamp(1.5rem, 6vw, 3rem);
+    font-weight: 900;
+    color: var(--sw-gold);
+    text-shadow: 0 0 20px var(--sw-gold-glow);
+    letter-spacing: clamp(3px, 1vw, 8px);
+    margin-bottom: 0.5rem;
+    padding-top: 1rem;
+}
+
+.public-timer-section::after {
+    content: 'BEAT THE CLOCK, SAVE THE GALAXY';
+    display: block;
+    text-align: center;
+    font-family: var(--sw-font);
+    font-size: clamp(0.5rem, 2vw, 0.9rem);
+    font-weight: 400;
+    color: var(--sw-gold);
+    opacity: 0.7;
+    letter-spacing: clamp(1px, 0.5vw, 4px);
+    margin-bottom: 1.5rem;
+}
+
+.public-timer-panel {
+    background: rgba(0, 0, 0, 0.9) !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 3px solid var(--sw-gold) !important;
+    border-radius: 20px !important;
+    box-shadow: 
+        0 0 30px rgba(255, 215, 0, 0.2),
+        inset 0 0 60px rgba(0, 0, 0, 0.8) !important;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem) !important;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Timer Display - Large Digital Clock */
+.public-timer-display {
+    font-family: var(--sw-font) !important;
+    font-size: clamp(4rem, 18vw, 10rem) !important;
+    font-weight: 900 !important;
+    color: #c0c0c0 !important;
+    text-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.3),
+        0 4px 8px rgba(0, 0, 0, 0.5) !important;
+    letter-spacing: clamp(0.02em, 1vw, 0.1em) !important;
+    -webkit-text-fill-color: #c0c0c0 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
+
+.public-timer-display.timer-warning {
+    color: #ffaa00 !important;
+    -webkit-text-fill-color: #ffaa00 !important;
+    text-shadow: 0 0 30px rgba(255, 165, 0, 0.5) !important;
+}
+
+.public-timer-display.timer-finished {
+    color: #ff3333 !important;
+    -webkit-text-fill-color: #ff3333 !important;
+    text-shadow: 0 0 30px rgba(255, 51, 51, 0.6) !important;
+}
+
+/* Timer Status */
+.public-timer-status {
+    font-family: var(--sw-font) !important;
+    font-size: clamp(0.8rem, 2.5vw, 1.2rem) !important;
+    letter-spacing: clamp(2px, 0.5vw, 4px) !important;
+}
+
+/* Timer preset buttons - Battle Clock Style */
+.public-timer-presets-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+}
+
+.public-preset-btn {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 2px solid #555 !important;
+    color: #888 !important;
+    font-family: var(--sw-font) !important;
+    font-weight: 700 !important;
+    font-size: clamp(0.85rem, 2vw, 1.1rem) !important;
+    padding: clamp(0.6rem, 1.5vw, 1rem) clamp(1rem, 2.5vw, 1.8rem) !important;
+    border-radius: 8px !important;
+    text-transform: uppercase !important;
+    transition: all 0.3s ease !important;
+    min-width: clamp(60px, 12vw, 90px);
+}
+
+.public-preset-btn:hover {
+    border-color: var(--sw-gold) !important;
+    color: var(--sw-gold) !important;
+    box-shadow: 0 0 15px var(--sw-gold-soft) !important;
+}
+
+.public-preset-btn.active {
+    background: var(--sw-gold) !important;
+    border-color: var(--sw-gold) !important;
+    color: #000 !important;
+    box-shadow: 0 0 20px var(--sw-gold-glow) !important;
+}
+
+/* Timer control buttons - Battle Clock Style */
+.public-timer-controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(0.5rem, 2vw, 1.25rem);
+}
+
+.public-control-btn {
+    font-family: var(--sw-font) !important;
+    font-weight: 700 !important;
+    font-size: clamp(1rem, 2.5vw, 1.3rem) !important;
+    padding: clamp(0.8rem, 2vw, 1.2rem) clamp(1.5rem, 4vw, 3rem) !important;
+    border-radius: 8px !important;
+    letter-spacing: clamp(1px, 0.3vw, 3px) !important;
+    text-transform: uppercase !important;
+    min-width: clamp(100px, 20vw, 150px);
+}
+
+.public-btn-start {
+    background: #28a745 !important;
+    border: 2px solid #28a745 !important;
+    box-shadow: 0 0 20px rgba(40, 167, 69, 0.4) !important;
+}
+
+.public-btn-start:hover:not(:disabled) {
+    box-shadow: 0 0 30px rgba(40, 167, 69, 0.6) !important;
+    transform: translateY(-2px);
+}
+
+.public-btn-stop {
+    background: #e91e63 !important;
+    border: 2px solid #e91e63 !important;
+    color: #fff !important;
+    box-shadow: 0 0 20px rgba(233, 30, 99, 0.4) !important;
+}
+
+.public-btn-stop:hover:not(:disabled) {
+    box-shadow: 0 0 30px rgba(233, 30, 99, 0.6) !important;
+    transform: translateY(-2px);
+}
+
+.public-btn-reset {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 2px solid #555 !important;
+    color: #ccc !important;
+    box-shadow: none !important;
+}
+
+.public-btn-reset:hover:not(:disabled) {
+    border-color: #888 !important;
+    color: #fff !important;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Battle Clock Responsive Adjustments */
+@media (max-width: 600px) {
+    .public-timer-section::before {
+        margin-bottom: 0.25rem;
+    }
+    
+    .public-timer-section::after {
+        margin-bottom: 1rem;
+    }
+    
+    .public-timer-panel {
+        border-radius: 12px !important;
+        border-width: 2px !important;
+    }
+    
+    .public-timer-clock-row {
+        gap: 0.5rem;
+    }
+    
+    .public-timer-presets-row {
+        gap: 0.4rem;
+    }
+    
+    .public-preset-btn {
+        min-width: 55px;
+        padding: 0.5rem 0.8rem !important;
+    }
+    
+    .public-timer-controls-row {
+        gap: 0.5rem;
+    }
+    
+    .public-control-btn {
+        min-width: 90px;
+        flex: 1;
+        max-width: 140px;
+    }
+}
+
+/* ========================
+   ENHANCED FOOTER
+======================== */
+footer {
+    background: linear-gradient(180deg, rgba(10, 10, 18, 0.9), rgba(13, 27, 42, 0.95)) !important;
+    border-top: 1px solid rgba(255, 215, 0, 0.2) !important;
+}
+
+/* ========================
+   RESPONSIVE - HIDE CHARACTERS
+======================== */
+@media (max-width: 1024px) {
+    .sw-char-login-left,
+    .sw-char-login-right {
+        width: 160px;
+    }
+    
+    .sw-char-jedi-panel,
+    .sw-char-sith-panel {
+        display: none;
+    }
+    
+    .sw-char-admin {
+        width: 110px;
+    }
+    
+    .sw-logo {
+        max-width: 200px;
+    }
+    
+    /* Hide flying objects on tablet */
+    .flying-object {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .sw-char-login-left,
+    .sw-char-login-right {
+        width: 120px;
+        opacity: 0.8;
+    }
+    
+    .sw-char-admin {
+        width: 90px;
+        opacity: 0.7;
+    }
+    
+    .sw-logo {
+        max-width: 160px;
+    }
+    
+    .sw-glass-panel {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+}
+
+@media (max-width: 520px) {
+    .sw-char-login-left,
+    .sw-char-login-right,
+    .sw-char-admin {
+        display: none;
+    }
+    
+    .sw-logo {
+        max-width: 140px;
+    }
+    
+    /* Reduce glass effects for performance */
+    .sw-glass-panel,
+    .jedi-panel,
+    .sith-panel,
+    .team-form-section,
+    .team-table-section,
+    .public-timer-panel {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+}
+
+/* ========================
+   DISABLE ANIMATIONS ON REDUCED MOTION
+======================== */
+@media (prefers-reduced-motion: reduce) {
+    .starfield .stars,
+    .starfield .stars-layer-2,
+    .starfield .stars-layer-3,
+    .sw-character,
+    .sw-logo {
+        animation: none;
+    }
+}
+
+/* ========================
+   ENHANCED ADMIN TIMER PAGE - BATTLE CLOCK STYLE
+======================== */
+.timer-display-section {
+    background: rgba(0, 0, 0, 0.9) !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 3px solid var(--sw-gold) !important;
+    border-radius: 20px !important;
+    box-shadow: 
+        0 0 30px rgba(255, 215, 0, 0.2),
+        inset 0 0 60px rgba(0, 0, 0, 0.8) !important;
+}
+
+.timer-display {
+    font-family: var(--sw-font) !important;
+    font-weight: 900 !important;
+    color: #00ff00 !important;
+    -webkit-text-fill-color: #00ff00 !important;
+    text-shadow: 0 0 30px rgba(0, 255, 0, 0.5) !important;
+}
+
+.timer-display.timer-warning {
+    color: #ffaa00 !important;
+    -webkit-text-fill-color: #ffaa00 !important;
+    text-shadow: 0 0 30px rgba(255, 165, 0, 0.5) !important;
+}
+
+.timer-display.timer-finished {
+    color: #ff3333 !important;
+    -webkit-text-fill-color: #ff3333 !important;
+    text-shadow: 0 0 30px rgba(255, 51, 51, 0.6) !important;
+}
+
+.timer-status {
+    font-family: var(--sw-font) !important;
+}
+
+.timer-presets-section {
+    background: transparent !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none !important;
+    border-radius: 12px !important;
+}
+
+.timer-presets-section h3 {
+    font-family: var(--sw-font) !important;
+    text-shadow: 0 0 10px var(--sw-gold-glow);
+}
+
+.preset-btn {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 2px solid #555 !important;
+    color: #888 !important;
+    font-family: var(--sw-font) !important;
+    font-weight: 700 !important;
+    transition: all 0.3s ease !important;
+}
+
+.preset-btn:hover {
+    border-color: var(--sw-gold) !important;
+    color: var(--sw-gold) !important;
+    box-shadow: 0 0 12px var(--sw-gold-soft) !important;
+}
+
+.preset-btn.active {
+    background: var(--sw-gold) !important;
+    border-color: var(--sw-gold) !important;
+    color: #000 !important;
+    box-shadow: 0 0 15px var(--sw-gold-glow) !important;
+}
+
+.control-btn {
+    font-family: var(--sw-font) !important;
+    font-weight: 700 !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-start {
+    box-shadow: 0 0 15px rgba(40, 167, 69, 0.4) !important;
+}
+
+.btn-start:hover:not(:disabled) {
+    box-shadow: 0 0 25px rgba(40, 167, 69, 0.6) !important;
+    transform: translateY(-2px);
+}
+
+.btn-stop {
+    background: #e91e63 !important;
+    border-color: #e91e63 !important;
+    color: #fff !important;
+    box-shadow: 0 0 15px rgba(233, 30, 99, 0.4) !important;
+}
+
+.btn-stop:hover:not(:disabled) {
+    background: #c2185b !important;
+    box-shadow: 0 0 25px rgba(233, 30, 99, 0.6) !important;
+    transform: translateY(-2px);
+}
+
+.btn-reset {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 2px solid #555 !important;
+    color: #ccc !important;
+    box-shadow: none !important;
+}
+
+.btn-reset:hover:not(:disabled) {
+    border-color: #888 !important;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(-2px);
+}
+
+/* ========================
+   ENHANCED OVERALL LEADERBOARD
+======================== */
+.leaderboard-section {
+    background: var(--sw-glass-bg) !important;
+    backdrop-filter: var(--sw-glass-blur);
+    -webkit-backdrop-filter: var(--sw-glass-blur);
+    border: 1px solid rgba(255, 215, 0, 0.2) !important;
+    border-radius: 16px !important;
+}
+
+.overall-title {
+    text-shadow: 0 0 20px var(--sw-gold-glow) !important;
+}
+
+/* ========================
+   ENHANCED ADMIN TABLE
+======================== */
+.teams-table {
+    background: transparent !important;
+}
+
+.teams-table thead {
+    background: rgba(10, 10, 18, 0.8) !important;
+}
+
+.teams-table th {
+    background: transparent !important;
+    text-shadow: 0 0 8px var(--sw-gold-glow);
+}
+
+.teams-table tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+.teams-table tbody tr:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.teams-table tbody tr:hover {
+    background: rgba(255, 215, 0, 0.08) !important;
+}
+
+/* Score buttons enhanced glow */
+.btn-round1 {
+    box-shadow: 0 0 8px rgba(125, 255, 106, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-round1:hover:not(:disabled) {
+    box-shadow: 0 0 15px rgba(125, 255, 106, 0.5) !important;
+}
+
+.btn-round2 {
+    box-shadow: 0 0 8px rgba(106, 195, 255, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-round2:hover:not(:disabled) {
+    box-shadow: 0 0 15px rgba(106, 195, 255, 0.5) !important;
+}
+
+.btn-reduce {
+    box-shadow: 0 0 8px rgba(255, 106, 106, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-reduce:hover:not(:disabled) {
+    box-shadow: 0 0 15px rgba(255, 106, 106, 0.5) !important;
+}
+
+/* ========================
+   ENHANCED CLASS SELECTOR
+======================== */
+.class-selector select {
+    background: var(--sw-glass-bg) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s ease !important;
+}
+
+.class-selector select:hover {
+    box-shadow: 0 0 15px var(--sw-gold-soft);
+}
+
+.class-selector select:focus {
+    box-shadow: 0 0 20px var(--sw-gold-glow) !important;
+}
+
+/* ========================
+   WELCOME MESSAGE ENHANCED
+======================== */
+.welcome-message {
+    background: var(--sw-glass-bg) !important;
+    backdrop-filter: var(--sw-glass-blur);
+    -webkit-backdrop-filter: var(--sw-glass-blur);
+    border: 1px solid rgba(255, 215, 0, 0.2) !important;
+    border-radius: 12px !important;
+}
+
+.welcome-message h2 {
+    text-shadow: 0 0 15px var(--sw-gold-glow);
+}

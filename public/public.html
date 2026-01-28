@@ -5,8 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GitWars Portal - Public Leaderboard</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/starwars-theme.css">
 </head>
 <body>
+    <!-- Animated Starfield Background -->
+    <div class="starfield">
+        <div class="stars"></div>
+        <div class="stars stars-layer-2"></div>
+        <div class="stars stars-layer-3"></div>
+    </div>
+
+    <!-- Flying Objects -->
+    <div class="flying-objects-container">
+        <div class="flying-object flying-droid">🤖</div>
+        <div class="flying-object flying-droid-2">🛸</div>
+        <div class="flying-object flying-rocket">🚀</div>
+        <div class="flying-object flying-rocket-2">✨</div>
+        <div class="flying-object shooting-star"></div>
+        <div class="flying-object shooting-star-2"></div>
+        <div class="flying-object shooting-star-3"></div>
+        <div class="flying-object mini-asteroid">💫</div>
+        <div class="flying-object flying-droid-3">⭐</div>
+    </div>
+
     <div class="page-wrapper">
         <!-- Header -->
         <header>
@@ -22,6 +43,11 @@
 
         <!-- Main Content -->
         <main>
+            <!-- Star Wars Logo -->
+            <div class="sw-logo-container">
+                <img src="images/starwars-logo.png" alt="Star Wars" class="sw-logo">
+            </div>
+
             <div class="dashboard-content">
 
                 <!-- View Toggle Buttons -->
@@ -182,13 +208,26 @@
         const publicBtnReset = document.getElementById("public-btn-reset");
         const publicPresetButtons = document.querySelectorAll(".public-preset-btn");
 
-        // Animation state (per table body)
+        // =====================================================
+        // LEADERBOARD ANIMATION SYSTEM
+        // Uses FLIP technique for smooth row position changes
+        // Triggered by Firestore onSnapshot live updates
+        // =====================================================
+
+        // Animation state (per table body) - stores previous ranks
         const rankMemory = new WeakMap();
 
+        /**
+         * Check if animations should run based on screen size
+         * Disabled on very small screens for performance
+         */
         function shouldAnimateRows() {
-            return !window.matchMedia("(max-width: 520px)").matches;
+            return !window.matchMedia("(max-width: 480px)").matches;
         }
 
+        /**
+         * Get or create rank state map for a table body
+         */
         function getRankState(tbody) {
             if (!rankMemory.has(tbody)) {
                 rankMemory.set(tbody, new Map());
@@ -196,10 +235,17 @@
             return rankMemory.get(tbody);
         }
 
+        /**
+         * Reset rank state when switching views or classes
+         */
         function resetRankState(tbody) {
             rankMemory.set(tbody, new Map());
         }
 
+        /**
+         * FLIP Step 1: Capture current positions of all rows
+         * Uses getBoundingClientRect for accurate positioning
+         */
         function captureRowPositions(tbody) {
             const positions = new Map();
             tbody.querySelectorAll("tr.leaderboard-row").forEach((row) => {
@@ -208,47 +254,75 @@
             return positions;
         }
 
+        /**
+         * FLIP Animation: Animate rows from old positions to new positions
+         * @param {HTMLElement} tbody - The table body element
+         * @param {Map} previousPositions - Map of teamId -> previous DOMRect
+         * @param {Map} rankState - Map of teamId -> previous rank number
+         */
         function applyFlipAnimation(tbody, previousPositions, rankState) {
             const rows = Array.from(tbody.querySelectorAll("tr.leaderboard-row"));
-
+            
             rows.forEach((row, index) => {
                 const key = row.dataset.teamId;
                 const previousRect = previousPositions.get(key);
                 const newRect = row.getBoundingClientRect();
-
-                if (previousRect && (previousRect.top !== newRect.top || previousRect.left !== newRect.left)) {
-                    const deltaX = previousRect.left - newRect.left;
-                    const deltaY = previousRect.top - newRect.top;
-
-                    row.style.transition = "none";
-                    row.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-                    requestAnimationFrame(() => {
-                        row.style.transition = "";
-                        row.style.transform = "";
-                    });
-                }
-
                 const previousRank = rankState.get(key);
                 const newRank = index + 1;
 
-                row.classList.remove("rank-up", "rank-down");
-                if (previousRank && previousRank !== newRank) {
-                    if (previousRank > newRank) {
-                        row.classList.add("rank-up");
-                    } else {
-                        row.classList.add("rank-down");
+                // Check if row position changed
+                const hasMoved = previousRect && 
+                    (Math.abs(previousRect.top - newRect.top) > 1 || 
+                     Math.abs(previousRect.left - newRect.left) > 1);
+
+                if (hasMoved) {
+                    // Calculate the delta (FLIP: Invert)
+                    const deltaY = previousRect.top - newRect.top;
+
+                    // Apply inverse transform immediately (no transition)
+                    row.style.transition = "none";
+                    row.style.transform = `translateY(${deltaY}px)`;
+                    row.style.zIndex = "50";
+
+                    // Apply visual feedback classes
+                    row.classList.remove("rank-up", "rank-down");
+                    if (previousRank && previousRank !== newRank) {
+                        row.classList.add(previousRank > newRank ? "rank-up" : "rank-down");
                     }
 
+                    // Force reflow to ensure transform is applied
+                    row.offsetHeight;
+
+                    // Animate to final position (FLIP: Play)
+                    requestAnimationFrame(() => {
+                        row.style.transition = "transform 0.5s ease-in-out";
+                        row.style.transform = "translateY(0)";
+                    });
+
+                    // Clean up after animation
+                    setTimeout(() => {
+                        row.style.transition = "";
+                        row.style.transform = "";
+                        row.style.zIndex = "";
+                    }, 550);
+
+                    // Remove glow classes after visible duration
                     setTimeout(() => {
                         row.classList.remove("rank-up", "rank-down");
-                    }, 800);
+                    }, 1500);
                 }
 
+                // Always update rank state
                 rankState.set(key, newRank);
             });
         }
 
+        /**
+         * Render table with FLIP animation support
+         * @param {HTMLElement} tbody - The table body to render into
+         * @param {Array} teams - Sorted array of team objects
+         * @param {Function} buildRow - Function to build row innerHTML
+         */
         function renderTableWithAnimation(tbody, teams, buildRow) {
             if (teams.length === 0) {
                 tbody.innerHTML = `
@@ -264,30 +338,41 @@
             const previousPositions = animate ? captureRowPositions(tbody) : null;
             const rankState = getRankState(tbody);
 
+            // Build document fragment for efficient DOM updates
             const fragment = document.createDocumentFragment();
 
             teams.forEach((team, index) => {
+                // Reuse existing row if present, otherwise create new
                 let row = tbody.querySelector(`tr[data-team-id="${team.id}"]`);
                 if (!row) {
                     row = document.createElement("tr");
                     row.className = "leaderboard-row";
                 }
 
+                // Set data attributes for identification
                 row.dataset.teamId = team.id;
                 row.dataset.role = team.role;
                 row.dataset.teamClass = team.class;
 
+                // Build row content
                 buildRow(row, team, index);
                 fragment.appendChild(row);
             });
 
+            // Clear and append new content
             tbody.innerHTML = "";
             tbody.appendChild(fragment);
 
-            if (animate && previousPositions) {
-                requestAnimationFrame(() => applyFlipAnimation(tbody, previousPositions, rankState));
+            // Apply FLIP animation if enabled
+            if (animate && previousPositions && previousPositions.size > 0) {
+                requestAnimationFrame(() => {
+                    applyFlipAnimation(tbody, previousPositions, rankState);
+                });
             } else {
-                teams.forEach((team, index) => rankState.set(team.id, index + 1));
+                // Just update rank state without animation
+                teams.forEach((team, index) => {
+                    rankState.set(team.id, index + 1);
+                });
             }
         }
         
